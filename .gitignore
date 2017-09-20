@@ -32,7 +32,7 @@ build
 *.class
 
 #emacs file
-~
+*~
 
 #data file
 graph.txt
