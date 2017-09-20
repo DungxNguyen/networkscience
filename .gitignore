@@ -36,3 +36,6 @@ build
 
 #data file
 graph.txt
+
+#cache-tests
+.cache-tests
