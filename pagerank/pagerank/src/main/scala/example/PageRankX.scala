@@ -45,14 +45,13 @@ object PageRank {
     GraphLoader.edgeListFile(sparkContext, Paths.get(getClass.getResource(filename).toURI).toString)
 
   def pageRank(graph: Graph[Int, Int], converge: Double = 0.000001, dampingFactor: Double = 0.85): Graph[Double, Int] = {
-
     val outDegree = graph.outDegrees.collectAsMap()
     val numVertices = graph.numVertices
     val const = (1 - dampingFactor) / numVertices
     val edges = graph.edges.cache
 
     @tailrec
-    def pageRankIter(graph: Graph[Double, Int], iter: Int = 100): Graph[Double, Int] = {
+    def pageRankIter(graph: Graph[Double, Int], iter: Int = 200): Graph[Double, Int] = {
       val neighbor = graph.collectNeighbors(EdgeDirection.In).mapValues {
         x => (x.foldLeft(0.0)((sum, p) => (sum + p._2 / outDegree(p._1))) * dampingFactor + const)
       }
@@ -73,15 +72,15 @@ object PageRank {
     pageRankIter(graph.mapVertices((id, attr) => (1.0 / numVertices)))
   }
 
-
   def pageRankPregel(graph: Graph[Int, Int], converge: Double = 0.000001, dampingFactor: Double = 0.85): Graph[Double, Int] = {
     val outDegree = graph.outDegrees.collectAsMap()
     val numVertices = graph.numVertices
     val const = (1 - dampingFactor) / numVertices
+
     graph.mapVertices((id, attr) => 1.0).
     pregel(1.0 / numVertices, 100, EdgeDirection.Out)(
         (id, prob, newProb) => (newProb * dampingFactor + const), 
          x => Iterator((x.dstId, x.srcAttr / outDegree(x.srcId) )), 
-        (x, y) => (x + y))
+        _ + _)
   }
 }
