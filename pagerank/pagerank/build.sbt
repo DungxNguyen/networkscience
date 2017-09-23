@@ -15,3 +15,7 @@ lazy val root = (project in file(".")).
       "org.apache.spark" %% "spark-graphx" % "2.2.0"
       )
   )
+
+
+mainClass in (Compile, packageBin) := Some("example.PageRank")
+fork := true

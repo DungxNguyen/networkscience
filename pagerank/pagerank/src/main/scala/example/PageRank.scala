@@ -41,8 +41,10 @@ object PageRank {
     sparkPageRank.foreach(print)
   }
 
-  def loadGraph(filename: String): Graph[Int, Int] =
-    GraphLoader.edgeListFile(sparkContext, Paths.get(getClass.getResource(filename).toURI).toString)
+  def loadGraph(filename: String): Graph[Int, Int] = {
+//    println(getClass.getResource(filename).toURI)
+    GraphLoader.edgeListFile(sparkContext, filename)}
+//    GraphLoader.edgeListFile(sparkContext, Paths.get(getClass.getResource(filename).toURI).toString)}
 
   def pageRank(graph: Graph[Int, Int], converge: Double = 0.000001, dampingFactor: Double = 0.85): Graph[Double, Int] = {
     val outDegree = graph.outDegrees.collectAsMap()
